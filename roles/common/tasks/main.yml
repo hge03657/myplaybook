@@ -1,0 +1,8 @@
+---
+- name: Install common package
+  become: yes
+  yum:
+    name: "{{ item }}"
+  with_items:
+    - unzip
+    - epel-release

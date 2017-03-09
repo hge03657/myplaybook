@@ -1,0 +1,15 @@
+wildfly_server:
+  install: true
+  version: 10.0.0.Final
+  base_dir: /usr/local
+  owner: vagrant
+  group: vagrant
+  admin_user: admin
+  admin_passwd: p@ssw0rD
+  config_opts:
+    -
+      name: -Djboss.bind.address
+      value: 0.0.0.0
+    -
+      name: -Djboss.bind.address.management
+      value: 0.0.0.0
