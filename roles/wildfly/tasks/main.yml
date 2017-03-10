@@ -1,9 +1,14 @@
 ---
+#- debug:
+#    var: wildfly_server
+#  tags:
+#    - debug
 - name: Create wildfly owner
   become: yes
   user:
     name:  "{{ wildfly_server.owner }}"
     group: "{{ wildfly_server.group }}"
+  when: ansible_system == "Linux"
 - name: Create wildfly home
   become: yes
   file:
@@ -17,8 +22,6 @@
     owner: "{{ wildfly_server.owner }}"
     group: "{{ wildfly_server.group }}"
     creates: "{{ wildfly_server.base_dir }}/wildfly-{{ wildfly_server.version }}/bin/standalone.conf"
-#- debug:
-#    var: wildfly_server.config_opts
 - name: Modify startup configuration
   lineinfile:
     dest: "{{ wildfly_server.base_dir }}/wildfly-{{ wildfly_server.version }}/bin/standalone.conf"
@@ -27,11 +30,12 @@
     backup: yes
   with_items: "{{ wildfly_server.config_opts }}"
 - name: Make password hash
-  shell: echo -n "{{ wildfly_server.admin_user }}:ManagementRealm:{{ wildfly_server.admin_passwd }}" | md5sum | awk '{ print $1}'
+  shell: echo "{{ wildfly_server.admin_user }}:ManagementRealm:{{ wildfly_server.admin_passwd }}" | awk '{printf $1}' | md5sum | awk '{ print $1}'
   register: mkhash
-- debug:
-    var: mkhash
-- name: Register user
+  changed_when: false
+#- debug:
+#    var: mkhash
+- name: Register admin user
   lineinfile:
     dest: "{{ wildfly_server.base_dir }}/wildfly-{{ wildfly_server.version }}/standalone/configuration/mgmt-users.properties"
     regexp: "^{{ wildfly_server.admin_user }}="
