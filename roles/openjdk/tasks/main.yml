@@ -2,3 +2,4 @@
 - name: Install java
   become: yes
   yum: name="java-{{ openjdk.version }}-openjdk"
+  when: ansible_os_family == "RedHat"
